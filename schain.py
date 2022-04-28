@@ -7,7 +7,6 @@ def get_sellers(domain: str):
     try:
         if domain[:8] == 'https://' or domain[:7] == 'http://':
             res = requests.get(f'{domain}sellers.json') 
-            print(f'{domain}sellers.json')
             if 'application/json' in res.headers.get('Content-Type'):
                 return res.json()['sellers']
         else:
@@ -24,8 +23,8 @@ def get_sellers(domain: str):
             }]
 
 
-domains_checked = []    # used for not checking any domain twice for sellers.json
-schain_object = {       # from openRTB github
+domains_checked = set()    # used for not checking any domain twice for sellers.json
+schain_object = {          # from openRTB github
     "schain": {
         "ver": "1.0",
         "complete": 0,
@@ -34,36 +33,38 @@ schain_object = {       # from openRTB github
 }
 
 # recursive function that takes the starting domain and preferred starting depth
-# for each seller if checks if it's intermediary and if it is
+# for each seller if checks if it's intermediary and if it is already in the checked domains
 def supply_chain(domain: str, depth: int) -> None:
     sellers = get_sellers(domain)
     for seller in sellers[:500]:
-        global domains_checked
-        global schain_object
-        # some sites 
+        # some sites have bad data
         if 'name' not in seller.keys():
             seller['name'] = "Not disclosed"
         if 'domain' not in seller.keys():
             seller['domain'] = "Not disclosed"
         if 'seller_type' not in seller.keys():
             seller['seller_type'] = "PUBLISHER"
+        if 'seller_id' not in seller.keys():
+            seller['seller_id'] = "None"
 
+        # seller node to be appended to the schain object
         seller_node = {
             "sid": seller['seller_id'],
             "name": seller['name'],
             "domain": seller["domain"],
             "depth": depth
         }
+
         if seller_node not in schain_object['schain']['nodes']: # append current seller node if not present in nodes
             schain_object['schain']['nodes'].append(seller_node)
+        
+        if seller['domain'] in domains_checked: # if domain already checked, no need to recurse
+            continue
+
         if seller['seller_type'] == 'INTERMEDIARY' or seller['seller_type'] == 'BOTH': # recurse if intermediary or both
-            if seller['domain'] in domains_checked: # if domain already checked, no need to recurse
-                continue
-            else:
-                seller['sellers'] = get_sellers(seller['domain'])
-                domains_checked.append(seller['domain'])
-                print(seller['domain'])
-                supply_chain(seller['domain'], depth + 1)
+            seller['sellers'] = get_sellers(seller['domain'])
+            domains_checked.add(seller['domain'])
+            supply_chain(seller['domain'], depth + 1)
 
 
 supply_chain('openx.com', 0)

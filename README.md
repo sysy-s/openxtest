@@ -18,15 +18,20 @@ File structure should look something along these lines:
           "sid": "123456",
           "name": "Company name or exception",
           "domain": "domain",
-          "depth": 0 (-1 if exception is thrown)
+          "depth": 0
         }, ...
     ]
 }
 ```
 Additionally it prints out the max depth of the chain when run.
 ### Run script (takes a while to run)
+* Option 1
 ```
 python3 schain.py
+```
+* Option 2 (multithreaded)
+```
+python3 schain_multi.py
 ```
 ## Task 2
 Outputs soonest possible meeting, starting with today's date
