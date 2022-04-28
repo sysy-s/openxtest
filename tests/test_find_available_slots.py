@@ -140,13 +140,13 @@ def test_get_soonest_meeting_vanilla():
 def test_get_soonest_meeting_empty_dir():
     calendars = []
     duration = 30
-    min_people = 2
+    min_people = 0 # no need for people since there are no calendars
     now = datetime.datetime(2022, 7, 1, 9, 0, 0)
     available_slots = get_available_slots(calendars, duration, now)
     possible_meetings = get_possible_meetings(calendars, available_slots, min_people)
     assert get_soonest_meeting(possible_meetings, now) == now
 
-def test_get_soonest_meeting_before_today():
+def test_get_soonest_meeting_not_before_now():
     calendars = []
     if platform.system() == 'Windows':
         calendars = get_calendars('\\tests\\calendars1')

@@ -86,6 +86,8 @@ def get_possible_meetings(calendars, available_slots, min_people):
 
 def get_soonest_meeting(possible_meetings, now):
     # all that's left is to sort the valid meetings and get the first one that isn't in the past
+    if possible_meetings == []:
+        return 'No meeting could satisfy these rules'
     soonest_meeting = possible_meetings[0][0]
     for meeting in possible_meetings:
         if meeting[0] < soonest_meeting and meeting[0] >= now:
@@ -101,16 +103,50 @@ def main(*argv):
     for i, arg in enumerate(argv):
         match arg:
             case '--calendars':
-                dir = argv[i+1]
-                if platform.system() == 'Windows':
-                    dir = dir.replace('/', '\\')
+                try:
+                    dir = argv[i+1]
+                    if platform.system() == 'Windows':
+                        dir = dir.replace('/', '\\')
+                except: 
+                    print('Invalid --calendars') 
+                    return
             case '--duration-in-minutes':
-                duration = int(argv[i+1])
+                try:
+                    if int(argv[i+1]) > 0:
+                        duration = int(argv[i+1])
+                    else:
+                        print('Invalid --duration-in-minutes')
+                        return
+                except: 
+                    print('Invalid --duration-in-minutes')
+                    return
             case '--minimum-people':
-                min_people = int(argv[i+1])                    
+                try:
+                    if int(argv[i+1]) > 0:
+                        min_people = int(argv[i+1]) 
+                    else:
+                        print('Invalid --minimum-people')      
+                        return     
+                except: 
+                    print('Invalid --minimum-people')      
+                    return            
             case _:
                 pass
-            
+    
+    # basic error handling
+    all_good = True
+    if dir == '':
+        print('Missing --calendars')
+        all_good = False
+    if duration == 0:
+        print('Missing --duration-in-minutes')
+        all_good = False
+    if min_people == 0:
+        print('Missing --min-people')
+        all_good = False
+    
+    if not all_good:
+        return
     # now = datetime.now().replace(microsecond=0)
     now = datetime(2022, 7, 1, 9, 0, 0)
     calendars = get_calendars(dir)
