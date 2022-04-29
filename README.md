@@ -19,7 +19,13 @@ File structure should look something along these lines:
           "name": "Company name or exception",
           "domain": "domain",
           "depth": 0
-        }, ...
+        },
+        {
+          "sid": "123457",
+          "name": "Company name or exception",
+          "domain": "domain",
+          "depth": 1
+        }
     ]
 }
 ```

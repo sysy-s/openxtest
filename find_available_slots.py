@@ -99,7 +99,7 @@ def main(*argv):
     duration = 0
     min_people = 0
 
-    # get args and store them in vars
+    # get args and store them in vars with basic error handling
     for i, arg in enumerate(argv):
         match arg:
             case '--calendars':
