@@ -54,7 +54,7 @@ def get_sellers(domain: str):
 def supply_chain(domain: str, depth: int) -> None:
     sellers = get_sellers(domain)
     print(domain, '-', len(sellers))
-    for seller in sellers[:100]:
+    for seller in sellers:
         global schain_object
         # some sites have lacking data so this is a quick fix
         if 'name' not in seller.keys():
